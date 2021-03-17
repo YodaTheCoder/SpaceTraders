@@ -1,0 +1,12 @@
+{
+  "name": "space-traders",
+  "version": "1.0.0",
+  "description": "Bot to play SpaceTraders.io",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0"
+  },
+  "type": "module"
+}
