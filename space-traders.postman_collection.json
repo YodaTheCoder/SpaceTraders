@@ -1,0 +1,643 @@
+{
+	"info": {
+		"_postman_id": "94fa391c-c310-4f75-9896-3a4e3170e49b",
+		"name": "space-traders",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Game Status",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"accept-encoding": true,
+					"accept": true,
+					"user-agent": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/game/status",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"game",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"pm.environment.set(\"token\", body.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/{{username}}/token",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"pm.environment.set(\"available_credits\", body.user.credits);",
+							"",
+							"const shipCount = body.user.ships.length;",
+							"pm.environment.set(\"ship_id\", shipCount === 1 ? body.user.ships[0].id : null);",
+							"pm.environment.set(\"ship_location\", shipCount === 1 ? body.user.ships[0].location : null);",
+							"pm.environment.set(\"ship_location_x\", shipCount === 1 ? body.user.ships[0].x : null);",
+							"pm.environment.set(\"ship_location_y\", shipCount === 1 ? body.user.ships[0].y : null);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/{{username}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Available Loans",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/game/loans?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"game",
+						"loans"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Startup Loan",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"type\": \"STARTUP\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{username}}/loans?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"loans"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Available Ships (console)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"const availableCredits = pm.environment.get(\"available_credits\");",
+							"const locale = pm.environment.get(\"locale\");",
+							"const affordableShips = body.ships.filter(s => {",
+							"    const affordableLocations = s.purchaseLocations.filter(p => {",
+							"        return p.price <= availableCredits;",
+							"    });",
+							"    return affordableLocations.length > 0;",
+							"});",
+							"console.log(`== availableCredits: ${availableCredits.toLocaleString(locale)}`);",
+							"console.log('== affordable ships ==');",
+							"affordableShips.forEach(s => {",
+							"    console.log(`\\t${s.manufacturer} ${s.type}`);",
+							"    s.purchaseLocations.forEach(p => {",
+							"        if (p.price > availableCredits) return;",
+							"        console.log(`\\t\\tlocation: ${p.location} @ ${p.price.toLocaleString(locale)}`);",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/game/ships?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"game",
+						"ships"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Purchase Ship",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"location\": \"OE-PM-TR\",\n    \"type\": \"JW-MK-I\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{username}}/ships?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"ships"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fuel Ship",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"shipId\": \"{{ship_id}}\",\n    \"good\": \"FUEL\",\n    \"quantity\": 20\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{username}}/purchase-orders?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"purchase-orders"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Marketplace",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"",
+							"console.log(`== ${body.location.symbol} Marketplace Items ==`)",
+							"body.location.marketplace.forEach(i => {",
+							"    console.log(`\\t${i.symbol}: ${i.quantityAvailable} units @ ${i.pricePerUnit} volume ${i.volumePerUnit}`);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/game/locations/{{ship_location}}/marketplace?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"game",
+						"locations",
+						"{{ship_location}}",
+						"marketplace"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Purchase Stuff",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"shipId\": \"{{ship_id}}\",\n    \"good\": \"METALS\",\n    \"quantity\": 80\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{username}}/purchase-orders?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"purchase-orders"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Planets (console)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"const ship_x = pm.environment.get(\"ship_location_x\");",
+							"const ship_y = pm.environment.get(\"ship_location_y\");",
+							"",
+							"let nearest_body = {",
+							"    distance: 9999999",
+							"};",
+							"",
+							"body.locations.forEach(l => {",
+							"    const dx = Math.abs(l.x - ship_x);",
+							"    const dy = Math.abs(l.y - ship_y);",
+							"    const distance = Math.sqrt((dx*dx)+(dy*dy));",
+							"    console.log(`${l.name} (${l.symbol}) is ${distance} away`);",
+							"    if (nearest_body.distance > distance) {",
+							"        nearest_body = l;",
+							"        nearest_body.distance = distance;",
+							"    }",
+							"});",
+							"",
+							"console.log(`\\n== nearest body ==`);",
+							"console.log(`${nearest_body.name} (${nearest_body.symbol}) @ ${nearest_body.distance}`);",
+							"",
+							"pm.environment.set(\"nearest_body\", nearest_body.symbol);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/game/systems/OE/locations?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"game",
+						"systems",
+						"OE",
+						"locations"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Moons (console)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"const ship_location = pm.environment.get(\"ship_location\");",
+							"const ship_x = pm.environment.get(\"ship_location_x\");",
+							"const ship_y = pm.environment.get(\"ship_location_y\");",
+							"",
+							"let nearest_body = {",
+							"    distance: 9999999",
+							"};",
+							"",
+							"body.locations.forEach(l => {",
+							"    const dx = Math.abs(l.x - ship_x);",
+							"    const dy = Math.abs(l.y - ship_y);",
+							"    const distance = Math.sqrt((dx*dx)+(dy*dy));",
+							"    console.log(`${l.name} (${l.symbol}) is ${distance} away`);",
+							"    if (nearest_body.distance > distance && l.symbol !== ship_location) {",
+							"        nearest_body = l;",
+							"        nearest_body.distance = distance;",
+							"    }",
+							"});",
+							"",
+							"console.log(`\\n== nearest moon ==`);",
+							"console.log(`${nearest_body.name} (${nearest_body.symbol}) @ ${nearest_body.distance}`);",
+							"",
+							"pm.environment.set(\"nearest_body\", nearest_body.symbol);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/game/systems/OE/locations?token={{token}}&type=MOON",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"game",
+						"systems",
+						"OE",
+						"locations"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						},
+						{
+							"key": "type",
+							"value": "MOON"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Flight Plan to Nearest Planet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"pm.environment.set(\"flight_plan_id\", body.flightPlan.id);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"shipId\": \"{{ship_id}}\",\n    \"destination\": \"{{nearest_planet}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{username}}/flight-plans?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"flight-plans"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View Flight Plan",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/{{username}}/flight-plans/{{flight_plan_id}}?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"flight-plans",
+						"{{flight_plan_id}}"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Sell Stuff",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"shipId\": \"{{ship_id}}\",\n    \"good\": \"METALS\",\n    \"quantity\": 80\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/{{username}}/sell-orders?token={{token}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"sell-orders"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "{{token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Payback Loan",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/{{username}}/loans/loan-id-here",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{username}}",
+						"loans",
+						"loan-id-here"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
