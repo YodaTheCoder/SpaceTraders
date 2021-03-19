@@ -1,4 +1,4 @@
-import { SpaceTraders, Bodies } from "./lib/stio.js";
+import { SpaceTraders } from "./lib/stio.js";
 const { ST_USERNAME, ST_TOKEN } = process.env;
 const STIO = new SpaceTraders(ST_USERNAME, ST_TOKEN);
 

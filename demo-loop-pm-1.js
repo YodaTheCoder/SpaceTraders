@@ -3,13 +3,13 @@ const trades = {
   sales: {},
 };
 
-const ship = "ship-id-here";
+const ship = "ckmg6w915145214715s6ue87lvlr";
 
 const leg1 = {
   ship,
   source: "OE-PM",
-  sell: null,
-  buy: "SHIP_PLATING",
+  sell: "METALS",
+  buy: "WORKERS",
   destination: "OE-PM-TR",
   trades,
   fuel: 4,
@@ -18,8 +18,8 @@ const leg1 = {
 const leg2 = {
   ship,
   source: "OE-PM-TR",
-  sell: "SHIP_PLATING",
-  buy: null,
+  sell: "WORKERS",
+  buy: "METALS",
   destination: "OE-PM",
   trades,
   fuel: 4,
